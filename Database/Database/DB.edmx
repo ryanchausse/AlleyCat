@@ -4,11 +4,164 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl" Namespace="DB.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005">
-        <EntityContainer Name="DBTargetContainer" >
-        </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+    <Schema Namespace="DB.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="DBStoreContainer">
+    <EntitySet Name="Hunts" EntityType="DB.Store.Hunts" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Waypoints" EntityType="DB.Store.Waypoints" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Clues" EntityType="DB.Store.Clues" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Photos" EntityType="DB.Store.Photos" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Users" EntityType="DB.Store.Users" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="HuntMembers" EntityType="DB.Store.HuntMembers" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="HuntWaypoint" Association="DB.Store.HuntWaypoint">
+      <End Role="Hunt" EntitySet="Hunts" />
+      <End Role="Waypoint" EntitySet="Waypoints" />
+    </AssociationSet>
+    <AssociationSet Name="HuntOwner" Association="DB.Store.HuntOwner">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Hunt" EntitySet="Hunts" />
+    </AssociationSet>
+    <AssociationSet Name="HuntHuntMember" Association="DB.Store.HuntHuntMember">
+      <End Role="Hunt" EntitySet="Hunts" />
+      <End Role="HuntMember" EntitySet="HuntMembers" />
+    </AssociationSet>
+    <AssociationSet Name="UserHuntMember" Association="DB.Store.UserHuntMember">
+      <End Role="User" EntitySet="Users" />
+      <End Role="HuntMember" EntitySet="HuntMembers" />
+    </AssociationSet>
+    <AssociationSet Name="WaypointClue" Association="DB.Store.WaypointClue">
+      <End Role="Waypoint" EntitySet="Waypoints" />
+      <End Role="Clue" EntitySet="Clues" />
+    </AssociationSet>
+    <AssociationSet Name="WaypointPhoto" Association="DB.Store.WaypointPhoto">
+      <End Role="Waypoint" EntitySet="Waypoints" />
+      <End Role="Photo" EntitySet="Photos" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Hunts">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Start" Type="datetime" Nullable="false" />
+    <Property Name="Finish" Type="datetime" Nullable="false" />
+    <Property Name="Owner_Id" Type="int" Nullable="false" />
+    <Property Name="HuntMember_Id" Type="int" Nullable="true" />
+  </EntityType>
+  <EntityType Name="Waypoints">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Lat" Type="float" Nullable="false" />
+    <Property Name="Long" Type="float" Nullable="false" />
+    <Property Name="Order" Type="int" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Hunt_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Clues">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="WaypointId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Photos">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Data" Type="varbinary(max)" Nullable="false" />
+    <Property Name="WaypointId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Users">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="HuntMember_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="HuntMembers">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
+  <Association Name="HuntWaypoint">
+    <End Role="Hunt" Type="DB.Store.Hunts" Multiplicity="1" />
+    <End Role="Waypoint" Type="DB.Store.Waypoints" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Hunt">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Waypoint">
+        <PropertyRef Name="Hunt_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="HuntOwner">
+    <End Role="User" Type="DB.Store.Users" Multiplicity="1" />
+    <End Role="Hunt" Type="DB.Store.Hunts" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Hunt">
+        <PropertyRef Name="Owner_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="HuntHuntMember">
+    <End Role="Hunt" Type="DB.Store.Hunts" Multiplicity="*" />
+    <End Role="HuntMember" Type="DB.Store.HuntMembers" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="HuntMember">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Hunt">
+        <PropertyRef Name="HuntMember_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="UserHuntMember">
+    <End Role="User" Type="DB.Store.Users" Multiplicity="*" />
+    <End Role="HuntMember" Type="DB.Store.HuntMembers" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="HuntMember">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="User">
+        <PropertyRef Name="HuntMember_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="WaypointClue">
+    <End Role="Waypoint" Type="DB.Store.Waypoints" Multiplicity="1" />
+    <End Role="Clue" Type="DB.Store.Clues" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Waypoint">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Clue">
+        <PropertyRef Name="WaypointId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="WaypointPhoto">
+    <End Role="Waypoint" Type="DB.Store.Waypoints" Multiplicity="1" />
+    <End Role="Photo" Type="DB.Store.Photos" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Waypoint">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Photo">
+        <PropertyRef Name="WaypointId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="DB" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
@@ -20,14 +173,6 @@
           <AssociationSet Name="HuntWaypoint" Association="DB.HuntWaypoint">
             <End Role="Hunt" EntitySet="Hunts" />
             <End Role="Waypoint" EntitySet="Waypoints" />
-          </AssociationSet>
-          <AssociationSet Name="WaypointClue" Association="DB.WaypointClue">
-            <End Role="Waypoint" EntitySet="Waypoints" />
-            <End Role="Clue" EntitySet="Clues" />
-          </AssociationSet>
-          <AssociationSet Name="WaypointPhoto" Association="DB.WaypointPhoto">
-            <End Role="Waypoint" EntitySet="Waypoints" />
-            <End Role="Photo" EntitySet="Photos" />
           </AssociationSet>
           <EntitySet Name="Users" EntityType="DB.User" />
           <AssociationSet Name="HuntOwner" Association="DB.HuntOwner">
@@ -42,6 +187,14 @@
           <AssociationSet Name="UserHuntMember" Association="DB.UserHuntMember">
             <End Role="User" EntitySet="Users" />
             <End Role="HuntMember" EntitySet="HuntMembers" />
+          </AssociationSet>
+          <AssociationSet Name="WaypointClue" Association="DB.WaypointClue">
+            <End Role="Waypoint" EntitySet="Waypoints" />
+            <End Role="Clue" EntitySet="Clues" />
+          </AssociationSet>
+          <AssociationSet Name="WaypointPhoto" Association="DB.WaypointPhoto">
+            <End Role="Waypoint" EntitySet="Waypoints" />
+            <End Role="Photo" EntitySet="Photos" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Hunt">
@@ -76,6 +229,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Description" Type="String" Nullable="false" />
           <NavigationProperty Name="Waypoint" Relationship="DB.WaypointClue" FromRole="Clue" ToRole="Waypoint" />
+          <Property Name="WaypointId" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Photo">
           <Key>
@@ -84,34 +238,11 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Data" Type="Binary" Nullable="false" />
           <NavigationProperty Name="Waypoint" Relationship="DB.WaypointPhoto" FromRole="Photo" ToRole="Waypoint" />
+          <Property Name="WaypointId" Type="Int32" Nullable="false" />
         </EntityType>
         <Association Name="HuntWaypoint">
           <End Type="DB.Hunt" Role="Hunt" Multiplicity="1" />
           <End Type="DB.Waypoint" Role="Waypoint" Multiplicity="*" />
-        </Association>
-        <Association Name="WaypointClue">
-          <End Type="DB.Waypoint" Role="Waypoint" Multiplicity="1" />
-          <End Type="DB.Clue" Role="Clue" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Waypoint">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Clue">
-              <PropertyRef Name="WaypointId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="WaypointPhoto">
-          <End Type="DB.Waypoint" Role="Waypoint" Multiplicity="1" />
-          <End Type="DB.Photo" Role="Photo" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Waypoint">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Photo">
-              <PropertyRef Name="WaypointId" />
-            </Dependent>
-          </ReferentialConstraint>
         </Association>
         <EntityType Name="User">
           <Key>
@@ -142,17 +273,125 @@
           <End Type="DB.User" Role="User" Multiplicity="*" />
           <End Type="DB.HuntMember" Role="HuntMember" Multiplicity="1" />
         </Association>
+        <Association Name="WaypointClue">
+          <End Type="DB.Waypoint" Role="Waypoint" Multiplicity="1" />
+          <End Type="DB.Clue" Role="Clue" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Waypoint">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Clue">
+              <PropertyRef Name="WaypointId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="WaypointPhoto">
+          <End Type="DB.Waypoint" Role="Waypoint" Multiplicity="1" />
+          <End Type="DB.Photo" Role="Photo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Waypoint">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Photo">
+              <PropertyRef Name="WaypointId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs" Space="C-S">
-        <Alias Key="Model" Value="DB" />
-        <Alias Key="Target" Value="DB.Store" />
-        <EntityContainerMapping CdmEntityContainer="DBContainer" StorageEntityContainer="DBTargetContainer">
-        </EntityContainerMapping>
-      </Mapping>
-    </edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="DBStoreContainer" CdmEntityContainer="DBContainer">
+    <EntitySetMapping Name="Hunts">
+      <EntityTypeMapping TypeName="IsTypeOf(DB.Hunt)">
+        <MappingFragment StoreEntitySet="Hunts">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Start" ColumnName="Start" />
+          <ScalarProperty Name="Finish" ColumnName="Finish" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Waypoints">
+      <EntityTypeMapping TypeName="IsTypeOf(DB.Waypoint)">
+        <MappingFragment StoreEntitySet="Waypoints">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Lat" ColumnName="Lat" />
+          <ScalarProperty Name="Long" ColumnName="Long" />
+          <ScalarProperty Name="Order" ColumnName="Order" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Clues">
+      <EntityTypeMapping TypeName="IsTypeOf(DB.Clue)">
+        <MappingFragment StoreEntitySet="Clues">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="WaypointId" ColumnName="WaypointId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Photos">
+      <EntityTypeMapping TypeName="IsTypeOf(DB.Photo)">
+        <MappingFragment StoreEntitySet="Photos">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Data" ColumnName="Data" />
+          <ScalarProperty Name="WaypointId" ColumnName="WaypointId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="IsTypeOf(DB.User)">
+        <MappingFragment StoreEntitySet="Users">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="HuntMembers">
+      <EntityTypeMapping TypeName="IsTypeOf(DB.HuntMember)">
+        <MappingFragment StoreEntitySet="HuntMembers">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="HuntWaypoint" TypeName="DB.HuntWaypoint" StoreEntitySet="Waypoints">
+      <EndProperty Name="Hunt">
+        <ScalarProperty Name="Id" ColumnName="Hunt_Id" />
+      </EndProperty>
+      <EndProperty Name="Waypoint">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="HuntOwner" TypeName="DB.HuntOwner" StoreEntitySet="Hunts">
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="Owner_Id" />
+      </EndProperty>
+      <EndProperty Name="Hunt">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="HuntHuntMember" TypeName="DB.HuntHuntMember" StoreEntitySet="Hunts">
+      <EndProperty Name="HuntMember">
+        <ScalarProperty Name="Id" ColumnName="HuntMember_Id" />
+      </EndProperty>
+      <EndProperty Name="Hunt">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+      <Condition ColumnName="HuntMember_Id" IsNull="false" />
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="UserHuntMember" TypeName="DB.UserHuntMember" StoreEntitySet="Users">
+      <EndProperty Name="HuntMember">
+        <ScalarProperty Name="Id" ColumnName="HuntMember_Id" />
+      </EndProperty>
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
@@ -166,6 +405,7 @@
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="True" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
       </DesignerInfoPropertySet>
     </edmx:Options>
     <!-- Diagram content (shape and connector positions) -->
