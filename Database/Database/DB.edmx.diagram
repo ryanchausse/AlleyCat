@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="5bbe119d77f440fb837f3111c06a9d69" Name="Diagram1" >
+        <EntityTypeShape EntityType="DB.Hunt" Width="1.5" PointX="5.375" PointY="2.375" />
+        <EntityTypeShape EntityType="DB.Waypoint" Width="1.5" PointX="7.5" PointY="2.375" />
+        <EntityTypeShape EntityType="DB.Clue" Width="1.5" PointX="10.375" PointY="2" />
+        <EntityTypeShape EntityType="DB.Photo" Width="1.5" PointX="10.375" PointY="4" />
+        <AssociationConnector Association="DB.HuntWaypoint" />
+        <AssociationConnector Association="DB.WaypointClue" />
+        <AssociationConnector Association="DB.WaypointPhoto" />
+        <EntityTypeShape EntityType="DB.User" Width="1.5" PointX="4.875" PointY="6.5" />
+        <AssociationConnector Association="DB.HuntOwner" />
+        <EntityTypeShape EntityType="DB.HuntMember" Width="1.5" PointX="2.125" PointY="4.5" />
+        <AssociationConnector Association="DB.HuntHuntMember" />
+        <AssociationConnector Association="DB.UserHuntMember" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
